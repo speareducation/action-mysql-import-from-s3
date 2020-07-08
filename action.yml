@@ -1,0 +1,33 @@
+name: Spear Core Database Setup
+description: A GitHub action to pull database schemas from AWS and import them into a mysql database
+branding:
+  icon: check-circle
+  color: green
+runs:
+  using: docker
+  image: Dockerfile
+inputs:
+  databases:
+    description: Space-delimited list of databases
+    required: true
+  aws_access_key_id:
+    description: AWS_ACCESS_KEY_ID
+    required: true 
+  aws_secret_access_key:
+    description: AWS_SECRET_ACCESS_KEY
+    required: true
+  mysql_host:
+    description: MySQL Host
+    required: false
+    default: mysql_tdd
+  mysql_user:
+    descritpion: MySQL User
+    required: false
+    default: root
+  mysql_pass:
+    description: MySQL Pass
+    required: false
+  mysql_port:
+    description: MySQL Port
+    required: false
+    default: 3306
