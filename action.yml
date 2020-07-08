@@ -10,12 +10,15 @@ inputs:
   databases:
     description: Space-delimited list of databases
     required: true
+  aws_region:
+    description: AWS_REGION (set when overriding ENV)
+    required: false
   aws_access_key_id:
-    description: AWS_ACCESS_KEY_ID
-    required: true 
+    description: AWS_ACCESS_KEY_ID (set when overriding ENV)
+    required: false 
   aws_secret_access_key:
-    description: AWS_SECRET_ACCESS_KEY
-    required: true
+    description: AWS_SECRET_ACCESS_KEY (set when overriding ENV)
+    required: false
   mysql_host:
     description: MySQL Host
     required: false

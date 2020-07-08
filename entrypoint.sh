@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+[ -z "$AWS_REGION" ] && [ ! -z "$INPUT_AWS_REGION" ] &&\
+    AWS_REGION="$INPUT_AWS_REGION"
+
+[ -z "$AWS_ACCESS_KEY_ID" ] && [ ! -z "$INPUT_AWS_ACCESS_KEY_ID" ] &&\ 
+    AWS_ACCESS_KEY_ID="$INPUT_AWS_ACCESS_KEY_ID"
+
+[ -z "$AWS_SECRET_ACCESS_KEY" ] && [ ! -z "$INPUT_AWS_SECRET_ACCESS_KEY" ] &&\ 
+    AWS_SECRET_ACCESS_KEY="$INPUT_AWS_SECRET_ACCESS_KEY"
+
 INITIAL_DIR=$(pwd)
 
 DATABASES=${DATABASES:-$1}
@@ -9,12 +18,12 @@ mkdir -p .drone/databases
 cd .drone/databases
 echo "
 [mysql]
-user = $MYSQL_USER
-host = $MYSQL_HOST
+user = $INPUT_MYSQL_USER
+host = $INPUT_MYSQL_HOST
 " > .my.cnf
 
-[ ! -z "$MYSQL_PASS" ] && echo "pass = $MYSQL_PASS" >> .my.cnf
-[ ! -z "$MYSQL_PORT" ] && echo "port = $MYSQL_PORT" >> .my.cnf
+[ ! -z "$INPUT_MYSQL_PASS" ] && echo "pass = $INPUT_MYSQL_PASS" >> .my.cnf
+[ ! -z "$INPUT_MYSQL_PORT" ] && echo "port = $INPUT_MYSQL_PORT" >> .my.cnf
 
 
 MYSQL="mysql --defaults-file=.my.cnf"
