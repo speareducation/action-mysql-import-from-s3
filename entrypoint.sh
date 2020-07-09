@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 
-[ -z "$AWS_REGION" ] && [ ! -z "$INPUT_AWS_REGION" ] &&\
-    export AWS_REGION="$INPUT_AWS_REGION"
-
-[ -z "$AWS_ACCESS_KEY_ID" ] && [ ! -z "$INPUT_AWS_ACCESS_KEY_ID" ] &&\
-    export AWS_ACCESS_KEY_ID="$INPUT_AWS_ACCESS_KEY_ID"
-
-[ -z "$AWS_SECRET_ACCESS_KEY" ] && [ ! -z "$INPUT_AWS_SECRET_ACCESS_KEY" ] &&\
-    export AWS_SECRET_ACCESS_KEY="$INPUT_AWS_SECRET_ACCESS_KEY"
-
 INITIAL_DIR=$(pwd)
 
 [ -z "$INPUT_DATABASES" ] && echo '$INPUT_DATABASES Not set' && exit 1
