@@ -7,9 +7,6 @@ runs:
   using: docker
   image: Dockerfile
 inputs:
-  s3_bucket:
-    description: The S3 Bucket
-    required: true
   databases:
     description: Space-delimited list of databases
     required: true
