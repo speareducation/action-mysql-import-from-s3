@@ -3,6 +3,7 @@
 INITIAL_DIR=$(pwd)
 
 [ -z "$INPUT_DATABASES" ] && echo '$INPUT_DATABASES Not set' && exit 1
+echo "AWS_REGION=$AWS_REGION" # debug
 
 mkdir .mysql-import-from-s3 && cd .mysql-import-from-s3
 
@@ -30,7 +31,8 @@ do
     db=$(echo "$ENTRY" | jq -r .db)
     s3Uri=$(echo "$ENTRY" | jq -r .s3Uri)
     dumpFile=$(basename "$s3Uri")
-    aws s3 cp "$s3Uri" "./$dumpFile" || exit 1
+    aws s3 cp "$s3Uri" "./$dumpFile"
+    [ ! -f "$dumpFile" ] && echo "Failed to download $dumpFile" && exit 1
 
     echo "Creating $db"
     $MYSQL -e "DROP DATABASE IF EXISTS $db; CREATE DATABASE $db;" || exit 1
