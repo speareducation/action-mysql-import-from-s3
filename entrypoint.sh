@@ -5,6 +5,8 @@ INITIAL_DIR=$(pwd)
 [ -z "$INPUT_DATABASES" ] && echo '$INPUT_DATABASES Not set' && exit 1
 echo "AWS_REGION=$AWS_REGION" # debug
 
+aws s3 ls s3://spear-backup/
+
 mkdir .mysql-import-from-s3 && cd .mysql-import-from-s3
 
 echo "
