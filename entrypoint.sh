@@ -36,7 +36,7 @@ do
     echo "Creating $db"
     $MYSQL -e "DROP DATABASE IF EXISTS $db; CREATE DATABASE $db;" || exit 1
     
-    echo "Importing $db"
+    echo "Importing $db from file '${dumpFile}'"
     if [[ "$dumpFile" == *.gz ]]
     then
         gunzip -c "$dumpFile" | $MYSQL $db
@@ -44,5 +44,6 @@ do
         cat "$dumpFile" | $MYSQL $db
     fi
 done
-
+echo "Cleaning up .mysql-import-from-s3 dir..."
+rm -rf .mysql-import-from-s3
 exit 0
