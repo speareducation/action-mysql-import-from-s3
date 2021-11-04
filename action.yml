@@ -8,7 +8,7 @@ runs:
   steps:
     - name: "Wait for MySQL"
       run: |
-        MYSQL="mysql --defaults-file=.my.cnf"
+        MYSQL="mysql"
   
         # Wait for MySQL to start"
         i=0; while [ $((i+1)) -lt 30 ] && [ ! $($MYSQL -Nse "SELECT VERSION();") ]
