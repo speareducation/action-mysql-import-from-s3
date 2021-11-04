@@ -9,7 +9,7 @@ runs:
     - name: "Install mysql runtime"
       run: |
         if ! which mysql >/dev/null; then
-          apt-get update && apt-get install -y mysql-client
+          sudo apt-get update && apt-get install -y mysql-client
         fi
       shell: bash
     - name: "Wait for MySQL"
