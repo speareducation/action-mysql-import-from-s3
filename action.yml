@@ -6,6 +6,12 @@ branding:
 runs:
   using: "composite"
   steps:
+    - name: "Install mysql runtime"
+      run: |
+        if ! which mysql >/dev/null; then
+          apt-get update && apt-get install -y mysql-client
+        fi
+      shell: bash
     - name: "Wait for MySQL"
       run: |
         MYSQL="mysql --defaults-file=.my.cnf"
