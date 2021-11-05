@@ -6,6 +6,7 @@ branding:
 runs:
   using: docker
   image: Dockerfile
+  post-entrypoint: 'cleanup.sh'
 inputs:
   databases:
     description: Space-delimited list of databases

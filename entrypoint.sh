@@ -4,7 +4,10 @@ INITIAL_DIR=$(pwd)
 
 [ -z "$INPUT_DATABASES" ] && echo '$INPUT_DATABASES Not set' && exit 1
 
-mkdir .mysql-import-from-s3 && cd .mysql-import-from-s3
+S3_IMPORTS_DIR=/tmp/.mysql-import-from-s3
+
+mkdir -p ${S3_IMPORTS_DIR}
+cd ${S3_IMPORTS_DIR}
 
 echo "
 [mysql]
@@ -44,6 +47,6 @@ do
         cat "$dumpFile" | $MYSQL $db
     fi
 done
-echo "Cleaning up .mysql-import-from-s3 dir..."
-rm -rf .mysql-import-from-s3
+echo "Cleaning up mysql imports dir ${S3_IMPORTS_DIR}..."
+rm -rf ${S3_IMPORTS_DIR}
 exit 0
