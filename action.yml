@@ -55,7 +55,8 @@ runs:
         done
 
     - name: Switch to Project Root
-      shell: cd "${{ github.workspace }}"
+      shell: bash
+      run: cd "${{ github.workspace }}"
     
     - name: Run Migrations
       shell: bash
