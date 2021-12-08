@@ -4,12 +4,101 @@ branding:
   icon: check-circle
   color: green
 runs:
-  using: docker
-  image: Dockerfile
+  using: composite
+  steps:
+    - name: Create Directory
+      shell: bash
+      run: mkdir .mysql-import-from-s3 && cd .mysql-import-from-s3
+    
+    - name: Setup my.cnf
+      shell: bash
+      run: |
+      echo "[mysql]" > .my.cnf
+      echo "host = ${{ inputs.mysql_host }}" >> .my.cnf
+      echo "user = ${{ inputs.mysql_user }}" >> .my.cnf
+      echo "password = ${{ inputs.mysql_password }}" >> .my.cnf
+      echo "port = ${{ inputs.mysql_port }}" >> .my.cnf
+
+    - name: Download Schemas
+      shell: bash
+      run: |
+      DATABASES="${{ inputs.databases }}"
+      for dbName in $DATABASES
+      do
+        path1="s3://${{ inputs.s3_bucket }}/schemas/branches/${{ inputs.base_ref }}/$dbName.latest.sql.gz"
+        path2="s3://${{ inputs.s3_bucket }}/schemas/$dbName.latest.sql.gz"
+        dumpFile="$dbName.sql.gz"
+        
+        echo "Downloading $path1"
+        aws s3 cp "$path1" "./$dumpFile" && continue
+        echo "$path1 not found."
+
+        echo "Downloading $path2"
+        aws s3 cp "$path2" "./$dumpFile" && continue
+        echo "$path2 not found."
+        echo "Unable to find database schema for '$dbName'"
+      done
+
+    - name: Import Schemas
+      shell: bash
+      run: |
+      DATABASES="${{ inputs.databases }}"
+      MYSQL="mysql --defaults-file=.my.cnf"
+      for dbName in $DATABASES
+      do
+        tddDbName="${dbName}_tdd"
+        dumpFile="$dbName.sql.gz"
+        echo "Creating '$tddDbName'"
+        $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
+        echo "Importing '$tddDbName'"
+        gunzip -c "$dumpFile" | $MYSQL $db || exit 1
+      done
+
+    - name: Switch to Project Root
+      shell: cd "${{ github.workspace }}"
+    
+    - name: Run Migrations
+      shell: bash
+      run: |
+      if [[ -f artisan ]]
+      then
+        php artisan migrate
+      done
+      if [[ -f package.json ]] && [[ -n "$(grep data:migrate package.json)" ]]
+      then
+        yarn data:migrate
+      fi
+
+    - name: Save Schemas
+      if: ${{ inputs.base_ref }}
+      shell: bash
+      run: |
+      cd .mysql-import-from-s3
+      DATABASES="${{ inputs.databases }}"
+      for dbName in $DATABASES
+      do
+        tddDbName="${dbName}_tdd"
+        dumpFile="$dbName.sql.gz"
+        mysqldump --defaults-file=.my.cnf --no-create-db $tddDbName | gzip > "$dumpFile"
+
+        path1="s3://${{ inputs.s3_bucket }}/schemas/branches/${{ inputs.base_ref }}/$dbName.latest.sql.gz"
+        aws s3 cp "./$dumpFile" "$path1"
+      done
+
+    - name: Cleanup
+      shell: bash
+      run: cd ${{ github.workspace }} && rm -rf .mysql-import-from-s3
+
 inputs:
   databases:
     description: Space-delimited list of databases
     required: true
+  s3_bucket:
+    description: S3 Bucket
+    required: true
+  base_ref:
+    description: The target ref of the PR, if it exists
+    required: false
   mysql_host:
     description: MySQL Host
     required: false
@@ -18,7 +107,7 @@ inputs:
     description: MySQL User
     required: false
     default: root
-  mysql_pass:
+  mysql_password:
     description: MySQL Pass
     required: false
   mysql_port:
