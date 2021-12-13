@@ -6,10 +6,19 @@ branding:
 runs:
   using: docker
   image: Dockerfile
+  entrypoint: entrypoint.sh
+  post-if: inputs.base_ref != ""
+  post-entrypoint: post-entrypoint.sh
 inputs:
   databases:
     description: Space-delimited list of databases
     required: true
+  s3_bucket:
+    description: The S3 bucket
+    required: true
+  base_ref:
+    description: The target branch to use for schema lookups
+    required: false
   mysql_host:
     description: MySQL Host
     required: false

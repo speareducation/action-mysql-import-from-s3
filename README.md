@@ -24,10 +24,5 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
-          databases: |
-            [
-                { "db": "spear0_accounts_tdd", "s3Uri": "s3://spear-backups/schemas/spear0_accounts.latest.sql.gz" },
-                { "db": "spear0_main_tdd",     "s3Uri": "s3://spear-backups/schemas/spear0_main.latest.sql.gz" },
-                { "db": "spear0_patient_tdd",  "s3Uri": "s3://spear-backups/schemas/spear0_patient.latest.sql.gz" }
-            ]
+          databases: db1 db2 db3
 ```
