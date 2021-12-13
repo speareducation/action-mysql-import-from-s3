@@ -1,4 +1,4 @@
 FROM spear/pipeline:latest
-COPY import.sh /import.sh
+COPY entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["/import.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
