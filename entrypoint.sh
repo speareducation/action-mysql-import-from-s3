@@ -48,8 +48,8 @@ do
     echo "Creating $dbName"
     $MYSQL -e "DROP DATABASE IF EXISTS $dbName; CREATE DATABASE $dbName;" || exit 1
     
-    echo "Importing $dbName from file '$dumpFile'"
-    gunzip -c "$dumpFile" | $MYSQL $dbName
+    echo "Importing $tddDbName from file '$dumpFile'"
+    gunzip -c "$dumpFile" | $MYSQL $tddDbName
 done
 
 exit 0
