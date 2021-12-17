@@ -6,7 +6,7 @@ branding:
 runs:
   using: docker
   image: Dockerfile
-  post-if: inputs.base_ref != ""
+  post-if: inputs.base_ref
   post-entrypoint: 'post-entrypoint.sh'
 inputs:
   databases:
