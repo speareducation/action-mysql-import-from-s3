@@ -45,8 +45,8 @@ do
     
     [[ ! -f "$dumpFile" ]] && echo "Failed to download $dumpFile" && exit 1
 
-    echo "Creating $dbName"
-    $MYSQL -e "DROP DATABASE IF EXISTS $dbName; CREATE DATABASE $dbName;" || exit 1
+    echo "Creating $tddDbName"
+    $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
     
     echo "Importing $tddDbName from file '$dumpFile'"
     gunzip -c "$dumpFile" | $MYSQL $tddDbName
