@@ -6,7 +6,7 @@ branding:
 runs:
   using: docker
   image: Dockerfile
-  post-entrypoint: 'post-entrypoint.sh'
+  post-entrypoint: '/post-entrypoint.sh'
 inputs:
   databases:
     description: Space-delimited list of databases
