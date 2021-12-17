@@ -26,7 +26,7 @@ then
         dumpFile="./${dbName}.sql"
 
         echo "Exporting schema dump for $dbName"
-        $MYSQLDUMP --no-create-db --no-data --ignore-table=migrations "$tddDbName" > $dumpFile
+        $MYSQLDUMP --no-create-db --no-data --ignore-table="$tddDbName.migrations" "$tddDbName" > $dumpFile
         $MYSQLDUMP --no-create-db "$tddDbName" "migrations" 2>/dev/null >> $dumpFile
 
         # reset auto increments
