@@ -35,7 +35,7 @@ then
         sed 's|AUTO_INCREMENT=[0-9]*|AUTO_INCREMENT=0|g' $dumpFile
         gzip $dumpFile
 
-        aws s3 cp "$dumpFile.gz" "s3://$INPUT_S3_BUCKET/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz"
+        aws s3 cp "$dumpFile.gz" "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz"
     done
 
     cd ${INITIAL_DIR}
