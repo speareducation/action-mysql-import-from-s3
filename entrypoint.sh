@@ -36,12 +36,12 @@ do
     echo "Downloading schema dump for $dbName"
 
     [[ -n "$INPUT_BASE_REF" ]] && \
-    echo "Trying s3://$INPUT_S3_BUCKET/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
-    aws s3 cp "s3://$INPUT_S3_BUCKET/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$dumpFile" 2>/dev/null
+    echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
+    aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$dumpFile" 2>/dev/null
 
     [[ ! -f "$dumpFile" ]] && \
-    echo "Trying s3://$INPUT_S3_BUCKET/schemas/$dbName.latest.sql.gz" && \
-    aws s3 cp "s3://$INPUT_S3_BUCKET/schemas/$dbName.latest.sql.gz" "$dumpFile"
+    echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" && \
+    aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" "$dumpFile"
     
     [[ ! -f "$dumpFile" ]] && echo "Failed to download $dumpFile" && exit 1
 
