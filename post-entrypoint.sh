@@ -26,7 +26,7 @@ then
         dumpFile="./${dbName}.sql"
 
         echo "Exporting schema dump for $dbName"
-        $MYSQLDUMP --no-create-db --no-data --ignore-table="$tddDbName.migrations" "$tddDbName" > $dumpFile || continue
+        $MYSQLDUMP --no-create-db --no-data --ignore-table="$tddDbName.migrations" "$tddDbName" > $dumpFile
         [[ ! -s "$dumpFile" ]] && echo "ERROR: $dumpFile is empty!" && continue
 
         $MYSQLDUMP --no-create-db "$tddDbName" "migrations" 2>/dev/null >> $dumpFile
