@@ -19,6 +19,7 @@ then
     [ ! -z "$INPUT_MYSQL_PORT" ] && echo "port = $INPUT_MYSQL_PORT" >> .my.cnf
 
     MYSQLDUMP="mysqldump --defaults-file=.my.cnf"
+    cat .my.cnf
 
     for dbName in $INPUT_DATABASES
     do
