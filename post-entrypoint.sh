@@ -19,7 +19,6 @@ then
     [ ! -z "$INPUT_MYSQL_PORT" ] && echo "port = $INPUT_MYSQL_PORT" >> .my.cnf
 
     MYSQLDUMP="mysqldump --defaults-file=.my.cnf"
-    cat .my.cnf
 
     for dbName in $INPUT_DATABASES
     do
@@ -34,7 +33,7 @@ then
         $MYSQLDUMP --no-create-db "$tddDbName" "migrations" 2>/dev/null >> $dumpFile
 
         # reset auto increments
-        sed 's|AUTO_INCREMENT=[0-9]*|AUTO_INCREMENT=0|g' $dumpFile
+        sed -i 's|AUTO_INCREMENT=[0-9]*|AUTO_INCREMENT=0|g' $dumpFile
         gzip $dumpFile
 
         aws s3 cp "$dumpFile.gz" "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz"
