@@ -12,7 +12,7 @@ then
     mkdir -p ${S3_IMPORTS_DIR}
     cd ${S3_IMPORTS_DIR}
 
-    echo '[mysql]' > .my.cnf
+    echo '[mysqldump]' > .my.cnf
     echo "user = $INPUT_MYSQL_USER" >> .my.cnf
     echo "host = $INPUT_MYSQL_HOST" >> .my.cnf
     [ ! -z "$INPUT_MYSQL_PASS" ] && echo "pass = $INPUT_MYSQL_PASS" >> .my.cnf
@@ -27,9 +27,10 @@ then
         dumpFile="./${dbName}.sql"
 
         echo "Exporting schema dump for $dbName"
-        $MYSQLDUMP --no-create-db --no-data --ignore-table="$tddDbName.migrations" "$tddDbName" > $dumpFile
+        $MYSQLDUMP --no-create-db --no-data "$tddDbName" > $dumpFile
         [[ ! -s "$dumpFile" ]] && echo "ERROR: $dumpFile is empty!" && continue
 
+        [[ -n "$(grep -c '`migrations`' $dumpFile)" ]] &&\
         $MYSQLDUMP --no-create-db "$tddDbName" "migrations" 2>/dev/null >> $dumpFile
 
         # reset auto increments
