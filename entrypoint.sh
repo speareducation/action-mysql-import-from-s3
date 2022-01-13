@@ -35,9 +35,10 @@ do
 
     echo "Downloading schema dump for $dbName"
 
-    [[ -n "$INPUT_BASE_REF" ]] && \
-    echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
-    aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$dumpFile" 2>/dev/null
+    # Disabled until empty database syndrom is resolved
+    # [[ -n "$INPUT_BASE_REF" ]] && \
+    # echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
+    # aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$dumpFile" 2>/dev/null
 
     [[ ! -f "$dumpFile" ]] && \
     echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" && \
