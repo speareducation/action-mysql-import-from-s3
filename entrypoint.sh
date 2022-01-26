@@ -9,11 +9,11 @@ S3_IMPORTS_DIR=/tmp/.mysql-import-from-s3
 mkdir -p ${S3_IMPORTS_DIR}
 cd ${S3_IMPORTS_DIR}
 
-echo "
+cat << EOF > .my.cnf
 [mysql]
 user = $INPUT_MYSQL_USER
 host = $INPUT_MYSQL_HOST
-" > .my.cnf
+EOF
 
 [ ! -z "$INPUT_MYSQL_PASS" ] && echo "pass = $INPUT_MYSQL_PASS" >> .my.cnf
 [ ! -z "$INPUT_MYSQL_PORT" ] && echo "port = $INPUT_MYSQL_PORT" >> .my.cnf
@@ -28,25 +28,29 @@ do
 done
 [ "$i" == "30" ] && echo "Failed to connect to mysql." && exit 1
 
-for ENTRY in $(echo "$INPUT_DATABASES" | jq -c .[])
+for dbName in $INPUT_DATABASES
 do
-    db=$(echo "$ENTRY" | jq -r .db)
-    s3Uri=$(echo "$ENTRY" | jq -r .s3Uri)
-    dumpFile=$(basename "$s3Uri")
-    aws s3 cp "$s3Uri" "./$dumpFile"
-    [ ! -f "$dumpFile" ] && echo "Failed to download $dumpFile" && exit 1
+    tddDbName="${dbName}_tdd"
+    dumpFile="./$dbName.sql.gz"
 
-    echo "Creating $db"
-    $MYSQL -e "DROP DATABASE IF EXISTS $db; CREATE DATABASE $db;" || exit 1
+    echo "Downloading schema dump for $dbName"
+
+    # Disabled until empty database syndrom is resolved
+    # [[ -n "$INPUT_BASE_REF" ]] && \
+    # echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
+    # aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$dumpFile" 2>/dev/null
+
+    [[ ! -f "$dumpFile" ]] && \
+    echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" && \
+    aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" "$dumpFile"
     
-    echo "Importing $db from file '${dumpFile}'"
-    if [[ "$dumpFile" == *.gz ]]
-    then
-        gunzip -c "$dumpFile" | $MYSQL $db
-    else
-        cat "$dumpFile" | $MYSQL $db
-    fi
+    [[ ! -f "$dumpFile" ]] && echo "Failed to download $dumpFile" && exit 1
+
+    echo "Creating $tddDbName"
+    $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
+    
+    echo "Importing $tddDbName from file '$dumpFile'"
+    gunzip -c "$dumpFile" | $MYSQL $tddDbName
 done
-echo "Cleaning up mysql imports dir ${S3_IMPORTS_DIR}..."
-rm -rf ${S3_IMPORTS_DIR}
+
 exit 0

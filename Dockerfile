@@ -9,5 +9,6 @@ RUN set -xe && \
 	pip3 install awscli
 
 COPY entrypoint.sh /entrypoint.sh
+COPY post-entrypoint.sh /post-entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
