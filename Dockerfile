@@ -1,4 +1,4 @@
-FROM alpine:3:11
+FROM alpine:3.11
 
 RUN set -xe && \
 	apk add bash openssh python3 curl git mysql-client pv jq
