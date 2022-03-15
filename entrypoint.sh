@@ -46,8 +46,10 @@ do
             echo "Creating $tddDbName"
             $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
 
-            echo "Importing $tddDbName from file '$dumpFile'"
+            echo "Importing $tddDbName from file './$dbName.branch.sql.gz'"
             gunzip -c "$dumpFile" | $MYSQL $tddDbName && continue # if successful, continue to next database
+
+            echo "Branch import failed. Trying default."
         fi
     fi
 
