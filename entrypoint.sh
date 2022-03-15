@@ -42,7 +42,6 @@ do
         aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$branchDumpFile" 2>/dev/null
         if [[ -f "$branchDumpFile" ]]
         then
-            errorOutput=$(mktemp)
             echo "Creating $tddDbName"
             $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
 
