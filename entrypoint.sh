@@ -38,16 +38,17 @@ do
     # Attempt to download and import schema branch file
     if [[ -n "$INPUT_BASE_REF" ]]
     then
+        branchDumpFile="./$dbName.branch.sql.gz"
         echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
-        aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "./$dbName.branch.sql.gz" 2>/dev/null
-        if [[ -f "./$dbName.branch.sql.gz" ]]
+        aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$branchDumpFile" 2>/dev/null
+        if [[ -f "$branchDumpFile" ]]
         then
             errorOutput=$(mktemp)
             echo "Creating $tddDbName"
             $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
 
-            echo "Importing $tddDbName from file './$dbName.branch.sql.gz'"
-            gunzip -c "$dumpFile" | $MYSQL $tddDbName && continue # if successful, continue to next database
+            echo "Importing $tddDbName from file '$branchDumpFile'"
+            gunzip -c "$branchDumpFile" | $MYSQL $tddDbName && continue # if successful, continue to next database
 
             echo "Branch import failed. Trying default."
         fi
