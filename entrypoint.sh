@@ -5,7 +5,6 @@ INITIAL_DIR=$(pwd)
 [ -z "$INPUT_DATABASES" ] && echo '$INPUT_DATABASES Not set' && exit 1
 
 S3_IMPORTS_DIR=/tmp/.mysql-import-from-s3
-
 mkdir -p ${S3_IMPORTS_DIR}
 cd ${S3_IMPORTS_DIR}
 
@@ -35,12 +34,24 @@ do
 
     echo "Downloading schema dump for $dbName"
 
-    # Disabled until empty database syndrom is resolved
-    # [[ -n "$INPUT_BASE_REF" ]] && \
-    # echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
-    # aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$dumpFile" 2>/dev/null
+    # Attempt to download and import schema branch file
+    if [[ -n "$INPUT_BASE_REF" ]]
+    then
+        branchDumpFile="./$dbName.branch.sql.gz"
+        echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
+        aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$branchDumpFile" 2>/dev/null
+        if [[ -f "$branchDumpFile" ]]
+        then
+            echo "Creating $tddDbName"
+            $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
 
-    [[ ! -f "$dumpFile" ]] && \
+            echo "Importing $tddDbName from file '$branchDumpFile'"
+            gunzip -c "$branchDumpFile" | $MYSQL $tddDbName && continue # if successful, continue to next database
+
+            echo "Branch import failed. Trying default."
+        fi
+    fi
+
     echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" && \
     aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" "$dumpFile"
     
@@ -52,5 +63,8 @@ do
     echo "Importing $tddDbName from file '$dumpFile'"
     gunzip -c "$dumpFile" | $MYSQL $tddDbName
 done
+
+echo "Cleaning up mysql imports dir ${S3_IMPORTS_DIR}..."
+rm -rf ${S3_IMPORTS_DIR}
 
 exit 0

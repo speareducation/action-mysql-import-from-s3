@@ -6,6 +6,7 @@ branding:
 runs:
   using: docker
   image: Dockerfile
+  post-if: success()
   post-entrypoint: '/post-entrypoint.sh'
 inputs:
   databases:

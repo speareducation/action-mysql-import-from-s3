@@ -5,6 +5,8 @@ INITIAL_DIR=$(pwd)
 [ -z "$INPUT_DATABASES" ] && echo '$INPUT_DATABASES Not set' && exit 1
 
 S3_IMPORTS_DIR=/tmp/.mysql-import-from-s3
+mkdir -p ${S3_IMPORTS_DIR}
+cd ${S3_IMPORTS_DIR}
 
 if [[ -n "$INPUT_BASE_REF" ]]
 then
