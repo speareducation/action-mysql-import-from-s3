@@ -35,12 +35,22 @@ do
 
     echo "Downloading schema dump for $dbName"
 
-    # Disabled until empty database syndrom is resolved
-    # [[ -n "$INPUT_BASE_REF" ]] && \
-    # echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
-    # aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$dumpFile" 2>/dev/null
+    # Attempt to download and import schema branch file
+    if [[ -n "$INPUT_BASE_REF" ]]
+    then
+        echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
+        aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "./$dbName.branch.sql.gz" 2>/dev/null
+        if [[ -f "./$dbName.branch.sql.gz" ]]
+        then
+            errorOutput=$(mktemp)
+            echo "Creating $tddDbName"
+            $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
 
-    [[ ! -f "$dumpFile" ]] && \
+            echo "Importing $tddDbName from file '$dumpFile'"
+            gunzip -c "$dumpFile" | $MYSQL $tddDbName && continue # if successful, continue to next database
+        fi
+    fi
+
     echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" && \
     aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" "$dumpFile"
     
