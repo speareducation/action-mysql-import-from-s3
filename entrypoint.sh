@@ -34,23 +34,24 @@ do
 
     echo "Downloading schema dump for $dbName"
 
+    # DISABLING THIS -- too many issues
     # Attempt to download and import schema branch file
-    if [[ -n "$INPUT_BASE_REF" ]]
-    then
-        branchDumpFile="./$dbName.branch.sql.gz"
-        echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
-        aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$branchDumpFile" 2>/dev/null
-        if [[ -f "$branchDumpFile" ]]
-        then
-            echo "Creating $tddDbName"
-            $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
+    # if [[ -n "$INPUT_BASE_REF" ]]
+    # then
+    #     branchDumpFile="./$dbName.branch.sql.gz"
+    #     echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" && \
+    #     aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/branches/$INPUT_BASE_REF/$dbName.sql.gz" "$branchDumpFile" 2>/dev/null
+    #     if [[ -f "$branchDumpFile" ]]
+    #     then
+    #         echo "Creating $tddDbName"
+    #         $MYSQL -e "DROP DATABASE IF EXISTS $tddDbName; CREATE DATABASE $tddDbName;" || exit 1
 
-            echo "Importing $tddDbName from file '$branchDumpFile'"
-            gunzip -c "$branchDumpFile" | $MYSQL $tddDbName && continue # if successful, continue to next database
+    #         echo "Importing $tddDbName from file '$branchDumpFile'"
+    #         gunzip -c "$branchDumpFile" | $MYSQL $tddDbName && continue # if successful, continue to next database
 
-            echo "Branch import failed. Trying default."
-        fi
-    fi
+    #         echo "Branch import failed. Trying default."
+    #     fi
+    # fi
 
     echo "Trying s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" && \
     aws s3 cp "s3://$INPUT_S3_BUCKET/aurora/schemas/$dbName.schema.latest.sql.gz" "$dumpFile"
