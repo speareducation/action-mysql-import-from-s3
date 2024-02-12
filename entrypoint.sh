@@ -14,7 +14,7 @@ user = $INPUT_MYSQL_USER
 host = $INPUT_MYSQL_HOST
 EOF
 
-[ ! -z "$INPUT_MYSQL_PASS" ] && echo "pass = $INPUT_MYSQL_PASS" >> .my.cnf
+[ ! -z "$INPUT_MYSQL_PASS" ] && echo "password = $INPUT_MYSQL_PASS" >> .my.cnf
 [ ! -z "$INPUT_MYSQL_PORT" ] && echo "port = $INPUT_MYSQL_PORT" >> .my.cnf
 
 MYSQL="mysql --defaults-file=.my.cnf"
