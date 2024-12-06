@@ -17,7 +17,7 @@ EOF
 [ ! -z "$INPUT_MYSQL_PASS" ] && echo "password = $INPUT_MYSQL_PASS" >> .my.cnf
 [ ! -z "$INPUT_MYSQL_PORT" ] && echo "port = $INPUT_MYSQL_PORT" >> .my.cnf
 
-MYSQL="mysql --defaults-file=.my.cnf"
+MYSQL="mariadb --defaults-file=.my.cnf --no-check-certificate"
 
 # Wait for MySQL to start"
 i=0; while [ $((i+1)) -lt 30 ] && [ ! $($MYSQL -Nse "SELECT VERSION();") ]
